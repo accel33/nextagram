@@ -1,25 +1,46 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import axios from "axios";
+import "./App.css";
 
-class App extends Component {
+class App extends React.Component {
+  state = {
+    users: []
+  };
+
+  componentDidMount() {
+    // performing a GET request
+    axios
+      .get("https://insta.nextacademy.com/api/v1/users")
+      .then(result => {
+        // If successful, we do stuffs with 'result'
+        this.setState({ users: result.data });
+        console.log(result.data);
+      })
+      .catch(error => {
+        // If unsuccessful, we notify users what went wrong
+        console.log("ERROR: ", error);
+      });
+  }
+
+  style = {
+    width: "300px",
+    height: "300px"
+  };
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <h1>Home Page</h1>
+        <ul>
+          {this.state.users.map(user => (
+            <div key={user.div}>
+              <li>
+                {user.id}: {user.username}
+              </li>
+              <img style={this.style} src={user.profileImage} alt="Pic" />
+            </div>
+          ))}
+        </ul>
       </div>
     );
   }
