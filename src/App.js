@@ -1,48 +1,58 @@
 import React, { Component } from "react";
-import axios from "axios";
-import "./App.css";
+import "./App.scss";
+import Axios from "axios";
+import Loader from "./components/Loader";
+import NavBar from "./components/NavBar";
 
-class App extends React.Component {
+import { Route, Link } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import UserProfilePage from "./pages/UserProfilePage";
+
+class App extends Component {
   state = {
+    loading: false,
     users: []
   };
 
   componentDidMount() {
-    // performing a GET request
-    axios
-      .get("https://insta.nextacademy.com/api/v1/users")
+    this.setState({ loading: true });
+    Axios.get("https://insta.nextacademy.com/api/v1/users")
       .then(result => {
-        // If successful, we do stuffs with 'result'
-        this.setState({ users: result.data });
-        console.log(result.data);
+        this.setState({
+          users: result.data,
+          loading: false
+        });
       })
       .catch(error => {
-        // If unsuccessful, we notify users what went wrong
         console.log("ERROR: ", error);
       });
   }
 
-  style = {
-    width: "300px",
-    height: "300px"
-  };
-
   render() {
-    return (
-      <div>
-        <h1>Home Page</h1>
-        <ul>
-          {this.state.users.map(user => (
-            <div key={user.div}>
-              <li>
-                {user.id}: {user.username}
-              </li>
-              <img style={this.style} src={user.profileImage} alt="Pic" />
-            </div>
-          ))}
-        </ul>
-      </div>
-    );
+    const { loading } = this.state;
+    if (loading) {
+      return <Loader />;
+    } else {
+      return (
+        <div>
+          <NavBar />
+          <Route
+            exact
+            path="/"
+            component={props => (
+              <HomePage {...props} users={this.state.users} />
+            )}
+          />
+          <Route
+            path="/users/:id"
+            component={props => (
+              <UserProfilePage {...props} users={this.state.users} />
+            )}
+          />
+          {/* <FlexibleButton text="Default" color="red" size="20" /> */}
+        </div>
+      );
+    }
   }
 }
 
